@@ -8,7 +8,7 @@ struct STATE {
 	int dummyactuation2;
 };
 
-STATE *CreateSampleState();
+STATE *CreateState();
 void DeleteState(STATE *state);
 
 #endif
