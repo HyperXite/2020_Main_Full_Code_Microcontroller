@@ -5,28 +5,54 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h> 
+#include "packetbuilder.h"
 #define MAX 80 
 #define PORT 5000 
-#define SA struct sockaddr 
+#define SA struct sockaddr
 void func(int sockfd) 
 { 
     char buff[MAX]; 
     int n,m; 
     char *str;
+    char buff2[MAX];
     int exitFlag = 0;
+    int exampleQueueNum = 3;
+    double exampleSensorData = 10.423;
+    char *exampleState = "Ready";
     str = malloc(sizeof (char) * MAX);
+    int firstTime = 0;
     while (exitFlag != 1){
         bzero(buff, sizeof(buff)); 
         printf("Enter the string : "); 
         n = 0; 
-        while ((buff[n++] = getchar()) != '\n') 
-            ; 
+        while ((buff[n++] = getchar()) != '\n'); 
+        /*printf("initial input is: |%s|\n", buff);
+        strncat(buff2, buff, 1);
+        printf("buff2 input is: |%s|\n", buff);*/
         //strcpy (str, buff);
         //strcat(str, "\n");
-        printf("String is: %s\n",buff);
-        m = write(sockfd, buff, n); 
+
+        //printf("Double1 is: %f\n", exampleSensorData);
+        //printf("String is1: %s\n",buff);
+        if (strncmp(buff,"a",1)==0){
+        	str = BuildPacketI(buff, exampleQueueNum);
+        }else if (strncmp(buff,"b",1)==0){
+        	str = BuildPacketI(buff, exampleQueueNum);
+        }else if (strncmp(buff,"j",1)==0){
+        	str = BuildPacketS(buff, exampleState);
+        }else{
+        	str = BuildPacketD(buff, exampleSensorData);
+        }
+        //printf("String is2: |%s|\n",str);
+        //printf("n is %d\n", n);
+        n = strlen(str)-1;
+       // printf("n is %d\n", n);
+        m = write(sockfd, str, n); 
+        m = write(sockfd, "\n", 1); 
+        //printf("String is3: |%s|\n",str);
+        //free(str);
         if (m < 0){
-        	perror ("ERROR writing to socket\n");
+            	perror ("ERROR writing to socket\n");
         }
         bzero(buff, sizeof(buff)); 
         m = read(sockfd, buff, sizeof(buff)); 
